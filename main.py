@@ -4,6 +4,7 @@ from helper_fun import id_gen
 
 app = FastAPI()
 
+
 books_db = {
             1:{
                 "title":"Don Quixote",
@@ -38,9 +39,11 @@ books_db = {
                 "author":"Robert Louis Stevenson",
                 "publication year":1981,
                 "genre":["Novel", "Adventure Fiction"]
-            },
+            }
         
 }
+
+id_generator = id_gen(len(books_db))
 
 class Book(BaseModel):
     title: str = Field(examples=["The Mysterious Banana"])
@@ -68,7 +71,7 @@ def get_book(id: int | None = None):
 #Create a new book
 @app.post("/add_book")
 def add_book(book_detail: Book):
-    id = id_gen(books_db)
+    id = next(id_generator)
     new_book_dict = book_detail.model_dump()
     books_db[id] = new_book_dict
     title = book_detail.model_dump()["title"]
