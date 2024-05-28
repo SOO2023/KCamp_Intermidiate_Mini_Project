@@ -52,21 +52,22 @@ class Book(BaseModel):
     genre:list[str] = Field(examples=[["Novel", "Drama"]])
 
 
-#Retrieve a list of books or just a book  
+#Retrieve a list of books in the collection
 @app.get("/books")
-def get_book(id: int | None = None):
-    #if no id, return all books in collection
-    if id is None:
-        return books_db
+def get_books():
+    return books_db
+
+#Retrieve a book with a given id
+@app.get("/books/{id}")
+def get_book(id:int):
+    book_dict = books_db.get(id)
+    #if book id does not exist, then return error message
+    if book_dict is None:
+        return {"error": f"This book id '{id}' does not exist in the book respository"}
+    
+    #if book id exists, then return book with id detail
     else:
-        book_dict = books_db.get(id)
-        #if book id does not exist, then return error message
-        if book_dict is None:
-            return {"error": f"This book id '{id}' does not exist in the book respository"}
-        
-        #if book id exists, then return book with id detail
-        else:
-            return {"id": id, "book_detail": book_dict}
+        return {"id": id, "book_detail": book_dict}
 
 #Create a new book
 @app.post("/add_book")
