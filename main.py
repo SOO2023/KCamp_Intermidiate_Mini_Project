@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
-from typing import Annotated
 from helper_fun import id_gen
 
 app = FastAPI()
