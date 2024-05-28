@@ -43,7 +43,7 @@ books_db = {
 }
 
 class Book(BaseModel):
-    title: str = Field(examples=["The Misterious Banana"])
+    title: str = Field(examples=["The Mysterious Banana"])
     author:str = Field(examples=["John Doe"])
     publication_year:int = Field(examples=[1905])
     genre:list[str] = Field(examples=[["Novel", "Drama"]])
@@ -88,9 +88,9 @@ def update_book(id: int, book_detail: Book):
     else:
         new_book_dict = book_detail.model_dump()
         books_db[id] = new_book_dict
+        updates = {i: {"old":old_book_dict[i], "new":new_book_dict[i]} for i in old_book_dict.keys() if old_book_dict[i] != new_book_dict[i]}
         return {"message":f"The book with id {id} was successfully updated!",
-                "new_book_detail": new_book_dict,
-                "old_book_detail": old_book_dict}
+                "updates":updates}
 
 #Delete a book with a given id       
 @app.delete("/book_delete/{id}")
