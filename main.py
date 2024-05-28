@@ -48,6 +48,7 @@ class Book(BaseModel):
     publication_year:int = Field(examples=[1905])
     genre:list[str] = Field(examples=[["Novel", "Drama"]])
 
+
 #Retrieve a list of books or just a book  
 @app.get("/books")
 def get_book(id: int | None = None):
@@ -62,7 +63,7 @@ def get_book(id: int | None = None):
         
         #if book id exists, then return book with id detail
         else:
-            return {id: book_dict}
+            return {"id": id, "book_detail": book_dict}
 
 #Create a new book
 @app.post("/add_book")
