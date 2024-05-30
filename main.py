@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status, Response
 from pydantic import BaseModel, Field
 from helper_fun import id_gen
 
@@ -63,14 +63,14 @@ def get_book(id:int):
     book_dict = books_db.get(id)
     #if book id does not exist, then return error message
     if book_dict is None:
-        return {"error": f"This book id '{id}' does not exist in the book respository"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"This book id '{id}' does not exist in the book respository.")
     
     #if book id exists, then return book with id detail
     else:
         return {"id": id, "book_detail": book_dict}
 
 #Create a new book
-@app.post("/add_book")
+@app.post("/add_book", status_code=status.HTTP_201_CREATED)
 def add_book(book_detail: Book):
     id = next(id_generator)
     new_book_dict = book_detail.model_dump()
@@ -80,13 +80,13 @@ def add_book(book_detail: Book):
             "book_detail":new_book_dict}
 
 #Update detail of an existing book with a given id
-@app.put("/book_update/{id}")
+@app.put("/book_update/{id}", status_code=status.HTTP_201_CREATED)
 def update_book(id: int, book_detail: Book):
     old_book_dict = books_db.get(id)
     
     #if book id does not exist, return error message
     if old_book_dict is None:
-        return {"error": f"This book id '{id}' does not exist in the book respository."}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"This book id '{id}' does not exist in the book respository.")
     
     #if book id exists, update the detail
     else:
@@ -97,17 +97,16 @@ def update_book(id: int, book_detail: Book):
                 "updates":updates}
 
 #Delete a book with a given id       
-@app.delete("/book_delete/{id}")
+@app.delete("/book_delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_book(id: int):
     book_dict = books_db.get(id)
     
     #if book id does not exist, return error message
     if book_dict is None:
-        return {"error": f"This book id '{id}' does not exist in the book respository."}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"This book id '{id}' does not exist in the book respository.")
     
     #if id exists, delete book from respository
     else:
         del books_db[id]
-        return {"message": f"The book with id {id} was successfully deleted from respository.",
-                "deleted_book_detail":book_dict}
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
         
